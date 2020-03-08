@@ -1,0 +1,20 @@
+{
+  "name": "deviceDB",
+  "version": "1.0.0",
+  "description": "A database that keeps track of purpose and status different devices and items",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "ctschacher",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.3"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.2"
+  }
+}
