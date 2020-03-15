@@ -1,0 +1,35 @@
+h1 {
+    color: gray;
+}
+
+th {
+    color: indigo;
+}
+
+table, th, td {
+    border: 0.1px thin grey;
+    height: 50px;
+    width: 80px;
+}
+
+
+body { 
+    background: url(/img/cream_dust/cream_dust.png) repeat 0 0;
+}
+
+ /* Style buttons */
+ .btn {
+    background-color: rgb(30, 184, 255); /* Blue background */
+    border: none; /* Remove borders */
+    color: rgb(22, 46, 7); /* White text */
+    padding: 12px 16px; /* Some padding */
+    font-size: 16px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+    float:left;
+    margin-right:1px;
+  }
+  
+  /* Darker background on mouse-over */
+  .btn:hover {
+    background-color: RoyalBlue;
+  } 

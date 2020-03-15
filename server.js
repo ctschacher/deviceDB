@@ -12,8 +12,6 @@ db.on('error', (error) => console.error(error));
 db.once('open', () => console.log('Connected to database'));
 
 const publicDirectoryPath = path.join(__dirname, 'public');
-// console.log(publicDirectoryPath)
-// console.log(Date.now())
 app.use(express.static(publicDirectoryPath));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));    // used by post values evaluation

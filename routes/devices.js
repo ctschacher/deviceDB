@@ -2,6 +2,27 @@ const express = require('express');
 const router = express.Router();
 const Device = require('../models/devices');
 
+getNumber = async function() {
+    const devices = await Device.find();
+    let length = devices.length;
+    let ids = [];
+
+    if(!length || length === 0) return 1;
+    devices.forEach((device) => ids.push(device.number));
+console.log('length: ', length)
+    // console.log('Found devices: ', devices);
+
+    console.log('all ids: ', ids);
+    let sortedIds = ids.sort((a, b) => a - b);
+    console.log('sorted: ', sortedIds)
+    for(var i = 1; i <= length; i++) {    
+        if(sortedIds[i-1] != i){
+                return i;
+        }
+    }
+    return length + 1;
+}
+
 router.get('/', async (req, res) => {
     try {
         const devices = await Device.find();   // accesses MongoDB to retrieve all device entries
@@ -17,11 +38,11 @@ router.get('/', async (req, res) => {
             let month = devices[i]._id.getTimestamp().getMonth()+1;
             if(month < 10) month = '0' + month;
             let year = devices[i]._id.getTimestamp().getFullYear();
-            let counter = devices[i]._id.toString().slice(-2);
+            let counter = devices[i].number;
 
             table += `
             <tr>
-                <td>${parseInt(counter, 16)}</td>
+                <td>${parseInt(counter)}</td>
                 <td>${devices[i].name}</td>
                 <td>${devices[i].project}</td>
                 <td>${year}-${month}-${day}</td>
@@ -32,12 +53,12 @@ router.get('/', async (req, res) => {
             </tr>`;
         };
         table += `
-        <form action="http://localhost:3000/devices/" method="post">
+        <form action="http://localhost:3000/devices/" method="post"  onsubmit="return ValidationEvent()">
         <td></td>
         <td><input type="text" id="name" name="name"></input></td>
         <td><input type="text" id="project" name="project"></input></td>
         <td></td>
-        <td><input type="submit" value="ADD" /></form></td>
+        <td><input type="submit" value="ADD" /></td>
         </form>`;
 
         res.render('index', {  // render for using the view engine
@@ -69,7 +90,7 @@ router.post('/:id', getDevice, async (req, res) => {
             if(month < 10) month = '0' + month;
             let year = objectId.getTimestamp().getFullYear();
 
-            let counter = objectId.toString().slice(-2);
+            let counter = devices[i].number;
 
             if(req.params.id === objectId.toString()) {
                 table += `
@@ -107,8 +128,12 @@ router.post('/:id', getDevice, async (req, res) => {
 
 // Create entry
 router.post('/', async (req, res) => {
+    // getNumber();
+
+    let myNumber = await getNumber();
   
     const device = new Device({
+        number: myNumber,
         name: req.body.name,
         project: req.body.project
     });
@@ -118,7 +143,13 @@ router.post('/', async (req, res) => {
         // res.status(201).json(newDevice);
         res.redirect('/devices');
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        // res.status(400).send(`<h1>${error.message}</h1>`)
+        console.log(error)
+        // res.status(400).json({ message: error });
+        res.render('index', {  // render for using the view engine
+            tableBody: table,
+            error: error.message            
+        });  
     }
 })
 

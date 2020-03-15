@@ -11,11 +11,9 @@ const deviceSchema = new mongoose.Schema({
     status: {
 
     },
-    dateAdded: {
-        type: Date,
-        required: true,
-        default: Date.now
-
+    number: {
+        type: Number,
+        required: true
     },
     info: {
         type: String
