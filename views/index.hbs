@@ -9,11 +9,12 @@
   
   
   <!-- Add icon library -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <script src="/js/onsubmit_event.js"></script>
+  <script src="/js/jqueryFunctions.js"></script>
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
     .navbar {
@@ -77,15 +78,15 @@
 <div class="container-fluid text-center">    
   <div class="row content">
     <div class="col-sm-2 sidenav">
-      <p><a href="http://localhost:3000/devices">Device DB</a></p>
+    
 
     </div>
-    <div class="col-sm-8 text-left"> 
+    <div class="col-sm-4 text-left" > 
       <h1>Device Database</h1>
       <p>Keep track of devices and item</p>
       <br><br>
-      <table style="width:50%">
-        <tr>
+      <table style="width:90%;" id="itemList">
+        <tr style="background-color: rgb(147, 207, 241);">
           <th>ID</th>
           <th>Name</th>
           <th>Project</th>
@@ -97,6 +98,40 @@
       </table>
       <br>
       <h3>{{{error}}}</h3>
+    </div>
+    <div class="col-sm-4 text-left">
+      <div class="well" style="margin-top: 100px; width: 70%">
+        <h3>Add item:</h3>
+        <form action="http://localhost:3000/devices/" method="post"  onsubmit="return ValidationEvent()">
+            <table>
+              <tr>
+                  <td><input type="text" id="name" name="name" placeholder="Name of the item"></input></td>
+                  <td><input type="text" id="project" name="project" placeholder="Name of the project"></input></td>
+              </tr>
+              <tr>
+                  <td><input type="submit" value="ADD" /></td>
+                  <td></td>
+              </tr>
+            </table>  
+        </form>
+      </div>
+      <div class="well" style="width:70%">
+        <h3>Search item:</h3>
+          <div class="input-group">
+            <form action="http://localhost:3000/devices/find" method="post">
+              <table>
+                <tr>
+                    <td><input type="text" name="sname" placeholder="Search Database ..."></input></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="SEARCH" /></td>
+                    <td></td>
+                </tr>
+              </table> 
+            </form>
+          </div>
+      </div>
     </div>
     <div class="col-sm-2 sidenav">
       <div class="well">

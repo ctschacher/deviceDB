@@ -9,12 +9,8 @@ getNumber = async function() {
 
     if(!length || length === 0) return 1;
     devices.forEach((device) => ids.push(device.number));
-console.log('length: ', length)
-    // console.log('Found devices: ', devices);
-
-    console.log('all ids: ', ids);
     let sortedIds = ids.sort((a, b) => a - b);
-    console.log('sorted: ', sortedIds)
+
     for(var i = 1; i <= length; i++) {    
         if(sortedIds[i-1] != i){
                 return i;
@@ -52,14 +48,8 @@ router.get('/', async (req, res) => {
                 </td>
             </tr>`;
         };
-        table += `
-        <form action="http://localhost:3000/devices/" method="post"  onsubmit="return ValidationEvent()">
-        <td></td>
-        <td><input type="text" id="name" name="name"></input></td>
-        <td><input type="text" id="project" name="project"></input></td>
-        <td></td>
-        <td><input type="submit" value="ADD" /></td>
-        </form>`;
+        // table += `
+        // `;
 
         res.render('index', {  // render for using the view engine
             tableBody: table              
@@ -71,53 +61,35 @@ router.get('/', async (req, res) => {
     }
 
 })
+
+// find by string
+router.post('/find', async (req, res) => {
+    console.log('Received POST request on /find');
+    let devices;
+    const regex = new RegExp(`${req.body.sname}`, 'gi');
+
+    try {
+        devices = await Device.find({ "name": { $regex: regex } });
+        console.log('Found match: ', devices);
+        if (!devices) return res.status(404).json({ message: 'Cannot find device in database' });
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+
+    res.render('index', {  // render for using the view engine
+       tableBody: getTable(devices)              
+   }); 
+
+})
+
 
 // getting one
 router.post('/:id', getDevice, async (req, res) => {
+    console.log('Received GET request on / with id:', req.params.id);
     try {
         const devices = await Device.find();   // accesses MongoDB to retrieve all device entries
-        console.log('Received GET request on /', req.params.id);
-        let table = '';
-
-        // create one table column per found device
-        for(let i = 0; i < devices.length; i++) {
-
-            let objectId = devices[i]._id;
-            // using the objectId to retrieve date
-            let day = objectId.getTimestamp().getDate();
-            if(day < parseInt(10)) day = '0' + day; 
-            let month = objectId.getTimestamp().getMonth()+1;
-            if(month < 10) month = '0' + month;
-            let year = objectId.getTimestamp().getFullYear();
-
-            let counter = devices[i].number;
-
-            if(req.params.id === objectId.toString()) {
-                table += `
-                <tr>
-                    <form action="http://localhost:3000/devices/update/${devices[i]._id}" method="post">
-                    <td>${parseInt(counter, 16)}</td>
-                    <td><input type="text" id="name" name="name" value="${devices[i].name}"></input></td>
-                    <td><input type="text" id="project" name="project" value="${devices[i].project}"></input></td>
-                    <td>${year}-${month}-${day}</td>
-                    <td><input type="submit" value="CHANGE" /></td>
-                    </form>
-                </tr>`;
-            } else {
-                table += `
-                <tr>
-                    <td>${parseInt(counter, 16)}</td>
-                    <td>${devices[i].name}</td>
-                    <td>${devices[i].project}</td>
-                    <td>${year}-${month}-${day}</td>
-                    <td></td>
-                </tr>`;
-            }
-            
-        };
-
         res.render('index', {  // render for using the view engine
-            tableBody: table              
+            tableBody: getTable(devices)              
         });  
 
         // res.json(devices);
@@ -125,11 +97,12 @@ router.post('/:id', getDevice, async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
+
 
 // Create entry
 router.post('/', async (req, res) => {
     // getNumber();
-
     let myNumber = await getNumber();
   
     const device = new Device({
@@ -179,6 +152,7 @@ router.post('/delete/:id', getDevice, async (req, res) => {   // patch instead (
     }
 });
 
+// middle ware handler
 async function getDevice(req, res, next) {
     let device;
 
@@ -193,5 +167,32 @@ async function getDevice(req, res, next) {
     next();
 }
 
+getTable = function(devices) {
+    let table = '';
+    // create one table column per found device
+    for(let i = 0; i < devices.length; i++) {
+
+        // using the objectId to retrieve date
+        let day = devices[i]._id.getTimestamp().getDate();
+        if(day < parseInt(10)) day = '0' + day; 
+        let month = devices[i]._id.getTimestamp().getMonth()+1;
+        if(month < 10) month = '0' + month;
+        let year = devices[i]._id.getTimestamp().getFullYear();
+        let counter = devices[i].number;
+
+        table += `
+        <tr>
+            <td>${parseInt(counter)}</td>
+            <td>${devices[i].name}</td>
+            <td>${devices[i].project}</td>
+            <td>${year}-${month}-${day}</td>
+            <td>
+                <form action="http://localhost:3000/devices/delete/${devices[i]._id}" method="post"><button class="btn" type="submit"><i class="fa fa-trash"></i></button></form>
+                <form action="http://localhost:3000/devices/${devices[i]._id}" method="post"><button class="btn" type="submit"><i class="fa fa-pencil-square"></i></button></form>
+            </td>
+        </tr>`;
+    };
+    return table;
+}
 
 module.exports = router;

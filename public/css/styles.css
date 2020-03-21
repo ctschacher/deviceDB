@@ -7,9 +7,9 @@ th {
 }
 
 table, th, td {
-    border: 0.1px thin grey;
+    border: 0.3px thin grey;
     height: 50px;
-    width: 80px;
+    padding-left: 40px;
 }
 
 
